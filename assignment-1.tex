@@ -1,0 +1,49 @@
+\documentclass[12pt]{article}
+
+\usepackage[brazilian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\title{Trabalho 1: LuaSocket}
+
+\author{Renan Almeida}
+
+\begin{document}
+
+\maketitle
+
+\section{Instruções}
+
+O trabalho está dividido em três arquivos:
+
+\begin{itemize}  
+    \item \textit{server.lua} contém o código do servidor.
+    \item \textit{client.lua} contém o código do cliente.
+    \item \textit{message.lua} contém a mensagem que será baixada pelo cliente.
+\end{itemize}
+
+Para executar o trabalho chame \textit{lua server.lua} em uma instância do terminal e \textit{lua client.lua} em outra.
+
+Para configurar os testes, mude os valores das variáveis \textit{iterations} e \textit{repetitions} no código do cliente. Essas variáveis controlam a quantidade de requisições feitas pelos testes.
+
+Para ambos os programas, é possível fornecer \textit{host} e \textit{porta} específicos através dos seus parâmetros. O primeiro parâmetro é o do \textit{host} e o segundo o da \textit{porta}.
+
+\section{Análise}
+
+Através dos experimentos, nota-se que manter o soquete aberto e reaproveitá-lo é muito mais rápido do que abrir e fechar o soquete para cada novo \textit{download}.
+
+Para as análises abaixo, chamaremos de \textbf{cliente 1} aquele que mantém o soquete aberto e \textbf{cliente 2} aquele que sempre fecha o soquete.
+
+Para \textbf{10 requisições}, o cliente 1 demorou 0.0015 segundos. O cliente 2 levou 0.006 segundos. O cliente 1 foi 4 vezes mais rápido que o cliente 2. Consideramos que o número de requisições, nesse caso, é baixo demais para fazer medições relevantes.
+
+Para \textbf{100 requisições}, o cliente 1 demorou 0.005 segundos. O cliente 2 levou 0.76 segundos. O cliente 1 foi 135 vezes mais rápido que o cliente 2.
+
+Para \textbf{1000 requisições}, o cliente 1 demorou 0.04 segundos. O cliente 2 levou 7.96 segundos. O cliente 1 foi 178 vezes mais rápido que o cliente 2.
+
+Para \textbf{10000 requisições}, o cliente 1 demorou 0.4 segundos. O cliente 2 levou 80 segundos. O cliente 1 foi 190 vezes mais rápido que o cliente 2.
+
+Para \textbf{100000 requisições}, o cliente 1 demorou 4.14 segundos. O cliente 2 levou 799 segundos. O cliente 1 foi 192 vezes mais rápido que o cliente 2.
+
+Percebemos pelas comparações que o cliente 1 é ordens de magnitude mais rápido do que o cliente 2. Podemos inferir que o custo de abrir e fechar um soquete é alto e é isso que faz com que o cliente 1 seja mais rápido.
+
+\end{document}
