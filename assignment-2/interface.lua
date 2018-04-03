@@ -9,11 +9,11 @@ interface { name = "someinterface",
                 direction = "in",
                 type = "string"
             }, {
-                direction = "in",
-                type = "double"
-            }, {
                 direction = "out",
                 type = "string"
+            }, {
+                direction = "in",
+                type = "double"
             }}
         },
         bar = {

@@ -1,32 +1,12 @@
-local sockets = require("sockets")
+local idl = require("idl")
+local protocol = require("protocol")
+local socket = require("socket")
 
--- TODO: remove
-local function dump(o)
-   if type(o) == 'table' then
-      local s = '{ '
-      for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. dump(v) .. ','
-      end
-      return s .. '} '
-   else
-      return tostring(o)
-   end
-end
+local ERROR_TIMEOUT = "todo: error timeout"
+local ERROR_UNKNOWN = "todo: error unknown"
+local ERROR_RPC = "rpc error: "
 
 local luarpc = {}
-
------------------------------------------------------
---
---  Auxiliary
---
------------------------------------------------------
-
--- validates a interface type
-local function validatetype(t, canvoid)
-    if t == "void" then assert(canvoid, "invalid type void for parameter")
-    else assert(t == "double" or t == "string", "invalid type " .. t) end
-end
 
 -----------------------------------------------------
 --
@@ -34,79 +14,67 @@ end
 --
 -----------------------------------------------------
 
-function luarpc.createProxy(ip, port, interface_file)
-    -- "parsing" from interface file
-    local obj
-    function interface(t) obj = t end
-    dofile(interface_file)
-
-    -- does nothing with the interface name
-    assert(obj.name)
-
-    -- fills the proxy with methods from the interface
-    local proxy = {}
-    for method_name, method_data in pairs(assert(obj.methods)) do
-        -- return type
-        validatetype(method_data.resulttype, true)
-        local returns = {} -- stores all return values' types
-        if method_data.resulttype ~= "void" then
-            table.insert(returns, method_data.resulttype)
-        end
-
-        -- parameters
-        local parameters = {} -- stores all parameters' types
-        for _, param in pairs(assert(method_data.args)) do
-            local dir = assert(param.direction)
-            validatetype(assert(param.type), false)
-
-            if dir == "in" then
-                table.insert(parameters, param.type)
-            elseif dir == "out" then
-                table.insert(returns, param.type)
-            elseif dir == "inout" then
-                table.insert(parameters, param.type)
-                table.insert(returns, param.type)
-            else
-                assert(nil, "invalid parameter type - " .. param.type)
-            end
-        end
-        
-        -- defines the method in the proxy
-        proxy[method_name] = function(...)
-            local args = {}
-            for _, arg in ipairs{...} do table.insert(args, arg) end
-
-            assert(#parameters >= #args, "too many arguments") -- ASK
-
-            -- ASK: convert "2" to 2.0?
-            -- checks the provided arguments
-            for i = 1, #args do
-                local p, a = parameters[i], type(args[i])
-                if a == "number" and p ~= "double" or
-                   a == "string" and p ~= "string" then
-                    assert(nil, "got '" .. a .. "' and expected '" .. p .. "'")
-                end
-            end
-
-            -- gives zero values based on type for missing arguments
-            for i = #args + 1, #parameters do
-                local tp = parameters[i]
-                if tp == "double" then
-                    table.insert(args, 0.0)
-                elseif tp == "string" then
-                    table.insert(args, "")
-                end
-            end
-
-            -- TODO: call remote
-            print("nugget")
-            
-            -- TODO: do something with returns
-            -- print(returns)
-        end
+-- auxiliary
+local function remote_call(ip, port, message) -- TODO: asserts
+    local client, err = socket.connect(ip, port)
+    if err then
+        print(ERROR_RPC .. "could not connect to servant")
+        return nil
     end
 
-    return proxy
+    client:send(message)
+    local responses = {}
+
+    while true do
+        local response, err = client:receive()
+        if response == nil then
+            if err == "closed" then break
+            elseif err == "timeout" then print(ERROR_TIMEOUT); return nil
+            else print(ERROR_UNKNOWN); return nil end
+        end
+        table.insert(responses, response)
+    end
+
+    client:close()
+
+    if responses[1] == protocol.ERROR then
+        assert(#responses == 2)
+        print(ERROR_RPC .. responses[2])
+        return nil
+    end
+
+    return responses
+end
+
+function luarpc.createProxy(ip, port, interface_file)
+    local interface_object = idl.parse(interface_file)
+    assert(interface_object.name) -- does nothing with the interface name
+    return idl.convert(interface_object, function(func, args, rets)
+        local message = protocol.parse(func, args)
+        local responses = remote_call(ip, port, message)
+        if not responses then return nil end
+        for i, response in ipairs(responses) do
+            -- TODO: move to idl
+            if rets[i] == "double" then
+                local number = tonumber(response)
+                if not number then
+                    print("todo err: returned value " .. i .. " must be a " .. rets[i])
+                    return nil
+                end
+                responses[i] = number
+            elseif rets[i] == "string" then
+                local string = tostring(response)
+                if not string then
+                    print("todo err: returned value " .. i .. " must be a " .. rets[i])
+                    return nil
+                end
+                responses[i] = string
+            else
+                assert(nil) -- TODO
+            end
+        end
+        return table.unpack(responses)
+    end)
 end
 
 -----------------------------------------------------
