@@ -22,12 +22,14 @@ assert(string == "foo is working", string)
 assert(not extra1)
 assert(not extra2)
 
--- another function
+-- another function ok
 local err, number = proxy.bar(15)
+assert(not err)
 assert(number == 25)
 
 -- implict convertion from string to number
 local err, number = proxy.bar("2.5")
+assert(not err)
 assert(number == 12.5)
 
 -- implict convertion from number to string
@@ -42,8 +44,17 @@ assert(not err, err)
 assert(number == 20, string.format("%.1f != 20", number))
 assert(string == "number is working", string)
 
--- unknown function
--- TODO: not working
+-- unimplemented function
 local err, value = proxy.baz(1, "string", 2)
-assert(err == "", err)
+assert(err == "luarpc error: servant does not implement function 'baz'", err)
+assert(not value)
+
+-- unknown function
+local err, value = proxy.bam()
+assert(err == "luarpc error: not and interface function 'bam'", err)
+assert(not value)
+
+-- invalid parameter type
+local err, value = proxy.bar("somestring")
+assert(err == "luarpc error: can't convert 'somestring' to double", err)
 assert(not value)

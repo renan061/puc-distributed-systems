@@ -1,22 +1,41 @@
 local idl = require("idl")
 local protocol = require("protocol")
 local socket = require("socket")
-local Interface = require("interface")
 
 local ERROR_LUARPC = "luarpc error: "
 
-local ERROR_CLOSED = ERROR_LUARPC .. "socket closed"
-local ERROR_TIMEOUT = ERROR_LUARPC .. "request timeout"
-local ERROR_UNKNOWN = ERROR_LUARPC .. "unknown"
-local ERROR_UNKNOWN_FUNCTION = ERROR_LUARPC .. "unknown function"
+local ERROR_CLOSED = "socket closed"
+local ERROR_TIMEOUT = "request timeout"
+local ERROR_UNIMPLEMENTED_FUNCTION = "servant does not implement function"
+local ERROR_UNKNOWN_FUNCTION = "not and interface function"
 
 local luarpc = {}
+
+-----------------------------------------------------
+--
+--  Stub Metatable
+--
+-----------------------------------------------------
+
+local stubmt = {
+    -- treats calls to functions that are not in the interface
+    __index = function(_, key)
+        local function_name = string.format(" '%s'", key)
+        return function()
+            return luarpc_error(ERROR_UNKNOWN_FUNCTION) .. function_name
+        end
+    end
+}
 
 -----------------------------------------------------
 --
 --  Auxiliary
 --
 -----------------------------------------------------
+
+function luarpc_error(error)
+    return ERROR_LUARPC .. error
+end
 
 function receive(client, pattern)
     local string, err = client:receive(pattern)
@@ -32,55 +51,17 @@ function receive(client, pattern)
     return string
 end
 
--- TODO
-function receive_arguments(client, interface_method)
-    local arguments = {}
-
-    for _, parameter_type in ipairs(interface_method.parameter_types) do
-        local line, err = receive(client, "*l")
-        if err then
-            return nil, err
-        end
-
-        local argument, err = idl.convertvalue(line, parameter_type)
-        if err then
-            return nil, err
-        end
-
-        table.insert(arguments, argument)
-    end
-
-    return arguments
-end
-
--- TODO
-function receive_rpc(client, interface) -- returns function_name, arguments, err
-    local function_name, err = receive(client, "*l")
-    if err then
-        return nil, nil, err
-    end
-
-    local interface_method = interface[function_name] 
-    if not interface_method then
-        return nil, nil, ERROR_UNKNOWN_FUNCTION
-    end
-
-    local arguments = receive_arguments(client, interface_method)
-    if err then
-        return nil, nil, err
-    end
-
-    return function_name, arguments
-end
-
 -----------------------------------------------------
 --
 --  createProxy
 --
 -----------------------------------------------------
 
-function luarpc.createProxy(ip, port, interface_file)
-    local stub, interface = {}, Interface.new(interface_file)
+function luarpc.createProxy(ip, port, idl_file)
+    local stub = {}
+    setmetatable(stub, stubmt)
+
+    local interface = idl.new(idl_file)
 
     for name, method in pairs(interface) do
         stub[name] = function(...)
@@ -94,8 +75,8 @@ function luarpc.createProxy(ip, port, interface_file)
             -- checks arguments' types
             for i, argument in ipairs(arguments) do
                 local parameter_type = method.parameter_types[i]
-                local err = idl.compatible_type(argument, parameter_type)
-                assert(not err, err)
+                local _, err = idl.convert_value(argument, parameter_type)
+                if err then return luarpc_error(err) end
             end
 
             -- adds missing arguments with zero values
@@ -113,7 +94,7 @@ function luarpc.createProxy(ip, port, interface_file)
             -- tries to connect to the servant
             local client, err = socket.connect(ip, port)
             if err then
-                return ERROR_LUARPC .. "could not connect to servant"
+                return luarpc_error("could not connect to servant")
             end
 
             -- calls the servant remotely
@@ -121,20 +102,20 @@ function luarpc.createProxy(ip, port, interface_file)
             client:send(string)
             local string, err = receive(client, "*a")
             client:close()
-            if err then
-                return err
-            end
+            if err then return err end
             
             -- unmarshalls the response and checks for possible errors
             local return_values = protocol.unmarshall(string)
-            if return_values[1] == protocol.ERROR then
-                return ERROR_LUARPC .. return_values[2]
+            if return_values[1] == protocol.error then
+                return luarpc_error(return_values[2])
             end
 
             -- converts the returned values to match the interface's types
             for i, return_value in ipairs(return_values) do
                 local return_type = method.return_types[i]
-                return_values[i] = idl.convertvalue(return_value, return_type)
+                local value, err = idl.convert_value(return_value, return_type)
+                if err then return luarpc_error(err) end
+                return_values[i] = value
             end
 
             return nil, table.unpack(return_values)
@@ -152,6 +133,7 @@ end
 
 local servants = {}
 
+-- TODO
 function luarpc.createServant(object, interface_file) -- returns ip, port
     -- low level
     function servantsocket()
@@ -165,7 +147,7 @@ function luarpc.createServant(object, interface_file) -- returns ip, port
 
     table.insert(servants, {
         socket = socket,
-        interface = Interface.new(interface_file),
+        interface = idl.new(interface_file),
         object = object
     })
 
@@ -178,8 +160,37 @@ end
 --
 -----------------------------------------------------
 
+-- auxiliary
+function servant_receive(client, idl) -- returns function_name, arguments, err
+    -- receives the function's name
+    local function_name, err = receive(client, "*l")
+    if err then
+        return nil, nil, err
+    end
+
+    -- checks if the function exists in the idl
+    local idl_function = idl[function_name] 
+    if not idl_function then
+        return nil, nil, ERROR_UNKNOWN_FUNCTION
+    end
+
+    -- receives the arguments
+    local arguments = {}
+    for _, parameter_type in ipairs(idl_function.parameter_types) do
+        local value, err = receive(client, "*l")
+        if err then return nil, nil, err end
+
+        local argument, err = idl.convert_value(value, parameter_type)
+        if err then return nil, nil, err end
+
+        table.insert(arguments, argument)
+    end
+
+    return function_name, arguments
+end
+
 function luarpc.waitIncoming()
-    if #servants < 1 then return end -- ASK
+    if #servants < 1 then return end
 
     -- TODO
     local servant = servants[1]
@@ -187,19 +198,33 @@ function luarpc.waitIncoming()
     local interface = servant.interface
     local object = servant.object
 
-    -- TODO: asserts and errors
     while true do
-        local client = assert(server:accept())
-
-        local function_name, arguments, err = receive_rpc(client, interface)
+        local client, err = server:accept()
         if err then
-            error(err)
+            print("internal error: " .. err)
+            goto continue
         end
 
-        local ret = {object[function_name](table.unpack(arguments))}
+        local function_name, arguments, err = servant_receive(client, interface)
+        if err then
+            client:send(protocol.marshall_error(err))
+            client:close()
+            goto continue
+        end
 
-        client:send(protocol.marshall(ret))
+        local function_ = object[function_name]
+        if not function_ then
+            function_name = string.format(" '%s'", function_name)
+            local message = ERROR_UNIMPLEMENTED_FUNCTION .. function_name
+            client:send(protocol.marshall_error(message))
+            client:close()
+            goto continue
+        end
+
+        client:send(protocol.marshall({function_(table.unpack(arguments))}))
         client:close()
+
+        ::continue::
     end
 end
 

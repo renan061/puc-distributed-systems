@@ -1,6 +1,8 @@
 local protocol = {}
 
-protocol.ERROR = "___ERRORPC: "
+-- TODO: Escapar \n com \:-)\
+
+protocol.error = "___ERRORPC: "
 
 -- "value1\nvalue2\nvalue3\n...\nvalueN\n"
 function protocol.marshall(values)
@@ -9,6 +11,10 @@ function protocol.marshall(values)
         string = string .. tostring(value) .. "\n"
     end
     return string
+end
+
+function protocol.marshall_error(message)
+    return protocol.marshall({protocol.error, message})
 end
 
 function protocol.unmarshall(string)

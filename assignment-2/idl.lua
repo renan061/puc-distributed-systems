@@ -1,69 +1,136 @@
 local idl = {}
+idl.__index = idl
 
------------------------------------------------------
---
---  Auxiliary
---
------------------------------------------------------
+-- types
+idl.type = {
+    double = "double",
+    string = "string"
+}
 
--- validates a interface type
-local function validatetype(t, canvoid)
-    if t == "void" then assert(canvoid, "invalid type void for parameter")
-    else assert(t == "double" or t == "string", "invalid type " .. t) end
-end
-
------------------------------------------------------
---
---  new TODO
---
------------------------------------------------------
-
-function idl.compatible_type(value, interface_type)
-    local value_type = type(value)
-    if interface_type == "double" then
-        if value_type == "number" then
-            return nil
-        elseif tonumber(value) ~= nil then
-            return nil
-        end
-    elseif interface_type == "string" then
-        if value_type == "string" then
-            return nil
-        elseif tostring(value) ~= nil then
-            return nil
-        end
-    else
-        error("invalid interface type - " .. interface_type)
-    end
-    
-    return string.format("value '%s' must have type %s", value, interface_type)
-end
-
------------------------------------------------------
---
---  IDL
---
------------------------------------------------------
+-- directions
+idl.direction = {
+    in_ = "in",
+    out = "out",
+    inout = "inout"
+}
 
 -- parses an idl file to a lua object
-function idl.parse(file)
+function parse(file)
     local interface_object
     function interface(i) interface_object = i end
     dofile(file)
     return assert(interface_object)
 end
 
-function idl.convertvalue(value, interface_type) -- returns value, error
+-- validates an idl type
+local function validate_type(t, canvoid)
+    if t == "void" then assert(canvoid, "invalid type void for parameter")
+    else assert(t == "double" or t == "string", "invalid type " .. t) end
+end
+
+-----------------------------------------------------
+--
+--  .new
+--
+-----------------------------------------------------
+
+function idl.new(file)
+    local t = {}
+
+    local interface_object = parse(file)
+    -- ASK: does nothing with the interface name?
+    local methods = assert(interface_object.methods)
+
+    for name, method in pairs(methods) do
+        -- return types
+        validate_type(method.resulttype, true)
+        local return_types = {}
+        if method.resulttype ~= "void" then
+            table.insert(return_types, method.resulttype)
+        end
+
+        -- parameter types
+        local parameter_types = {}
+        for _, parameter in pairs(assert(method.args)) do
+            local direction = assert(parameter.direction)
+            validate_type(assert(parameter.type), false)
+
+            if direction == "in" then
+                table.insert(parameter_types, parameter.type)
+            elseif direction == "out" then
+                table.insert(return_types, parameter.type)
+            elseif direction == "inout" then
+                table.insert(parameter_types, parameter.type)
+                table.insert(return_types, parameter.type)
+            else
+                error("invalid interface parameter type - " .. parameter.type)
+            end
+        end
+
+        t[name] = {
+            parameter_types = parameter_types,
+            return_types = return_types
+        }
+    end
+
+    setmetatable(t, idl)
+    return t
+end
+
+-----------------------------------------------------
+--
+--  .convert_value
+--
+-----------------------------------------------------
+
+function idl.convert_value(value, idl_type) -- returns value, error
     local convert
-    if interface_type == "double" then convert = tonumber
-    elseif interface_type == "string" then convert = tostring
-    else error("invalid interface type - " .. interface_type) end
+    if idl_type == idl.type.double then
+        convert = tonumber
+    elseif idl_type == idl.type.string then
+        convert = tostring
+    else
+        error("invalid interface type - " .. idl_type)
+    end
 
     local converted = convert(value)
     if not converted then
-        return nil, "error: can't convert " .. value .. " to " .. interface_type
+        return nil, string.format("can't convert '%s' to %s", value, idl_type)
     end
+
     return converted    
+end
+
+-----------------------------------------------------
+--
+--  :string
+--
+-----------------------------------------------------
+
+function idl:string()
+    local string = "interface {\n"
+
+    for name, method in pairs(self) do
+        string = string .. "\t" .. name .. " {\n"
+
+        string = string .. "\t\treturn_types = {"
+        for _, return_type in ipairs(method.return_types) do
+            string = string .. tostring(return_type) .. " "
+        end
+        string = string .. "}\n"
+
+        string = string .. "\t\tparameter_types = {"
+        for _, parameter_type in ipairs(method.parameter_types) do
+            string = string .. tostring(parameter_type) .. " "
+        end
+        string = string .. "}\n"
+
+        string = string .. "\t}\n"
+    end
+
+    string = string .. "}"
+
+    return string
 end
 
 return idl
