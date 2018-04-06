@@ -11,15 +11,15 @@ local obj = {
 
 -- catalogue
 local ip, port = "0.0.0.0", assert(arg[1])
-local catalogue = luarpc.createProxy(ip, port, "catalogue_interface")
+local catalogue = luarpc.createProxy(ip, port, "catalogue.interface")
 
 -- someinterface1
-local ip, port = luarpc.createServant(obj, "interface")
+local ip, port = luarpc.createServant(obj, "interface.interface")
 local err = catalogue.register(ip, port, "someinterface1")
 assert(not err, err)
 
 -- someinterface2
-local ip, port = luarpc.createServant(obj, "interface")
+local ip, port = luarpc.createServant(obj, "interface.interface")
 local err = catalogue.register(ip, port, "someinterface2")
 assert(not err, err)
 

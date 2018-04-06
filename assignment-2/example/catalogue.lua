@@ -1,4 +1,4 @@
-local luarpc = require("luarpc")
+local luarpc = require("../luarpc")
 
 local servants = {}
 
@@ -23,6 +23,6 @@ local catalogue = {
     end
 }
 
-local ip, port = luarpc.createServant(catalogue, "catalogue_interface")
+local ip, port = luarpc.createServant(catalogue, "catalogue.interface")
 print(string.format("Catálogo - IP: %s, Porta: %s", ip, port))
 luarpc.waitIncoming()
