@@ -18,7 +18,7 @@ local luarpc = {}
 -----------------------------------------------------
 
 local stubmt = {
-    -- treats calls to functions that are not in the interface
+    -- treats calls to functions that are not in the idl
     __index = function(_, key)
         local function_name = string.format(" '%s'", key)
         return function()
@@ -61,9 +61,9 @@ function luarpc.createProxy(ip, port, idl_file)
     local stub = {}
     setmetatable(stub, stubmt)
 
-    local interface = idl.new(idl_file)
+    local idl = idl.new(idl_file)
 
-    for name, method in pairs(interface) do
+    for name, method in pairs(idl) do
         stub[name] = function(...)
             local arguments = {...}
 
@@ -133,21 +133,14 @@ end
 
 local servants = {}
 
--- TODO
-function luarpc.createServant(object, interface_file) -- returns ip, port
-    -- low level
-    function servantsocket()
-        local host, port = "*", 8080 -- TODO: localhost, 8080
-        local server = assert(socket.bind(host, port))
-        local ip, port = server:getsockname()
-        return server, ip, port
-    end
-
-    local socket, ip, port = servantsocket()
+function luarpc.createServant(object, idl_file) -- returns ip, port
+    local socket = assert(socket.bind("*", 0))
+    -- TODO: settimeout ?
+    local ip, port = socket:getsockname()
 
     table.insert(servants, {
         socket = socket,
-        interface = idl.new(interface_file),
+        idl = idl.new(idl_file),
         object = object
     })
 
@@ -192,63 +185,60 @@ end
 function luarpc.waitIncoming()
     if #servants < 1 then return end
 
-    -- TODO
-    local servant = servants[1]
-    local server = servant.socket
-    local interface = servant.interface
-    local object = servant.object
+    -- fills a list with the sockets from the servants
+    local sockets = {}
+    for _, servant in ipairs(servants) do
+        table.insert(sockets, servant.socket)
+    end
 
     while true do
-        local client, err = server:accept()
-        if err then
-            print("internal error: " .. err)
-            goto continue
-        end
+        local sockets, _, err = socket.select(sockets, nil)
+        assert(not err) -- ASK
 
-        local function_name, arguments, err = servant_receive(client, interface)
-        if err then
-            client:send(protocol.marshall_error(err))
+        for i, socket in ipairs(sockets) do
+            -- finds the corresponding servant for the socket
+            local servant
+            for _, s in ipairs(servants) do
+                if s.socket == socket then
+                    servant = s
+                    break
+                end
+            end
+
+            -- accepts the connection
+            local client, err = socket:accept()
+            if err then
+                print("internal error: " .. err)
+                goto continue
+            end
+
+            -- receives the marshalled message and unmarshalls it
+            local idl = servant.idl
+            local function_name, arguments, err = servant_receive(client, idl)
+            if err then
+                client:send(protocol.marshall_error(err))
+                client:close()
+                goto continue
+            end
+
+            -- checks if the associated function exists
+            local function_ = servant.object[function_name]
+            if not function_ then
+                function_name = string.format(" '%s'", function_name)
+                local message = ERROR_UNIMPLEMENTED_FUNCTION .. function_name
+                client:send(protocol.marshall_error(message))
+                client:close()
+                goto continue
+            end
+
+            -- calls the function and sends the return values back
+            client:send(protocol.marshall({function_(table.unpack(arguments))}))
             client:close()
-            goto continue
+
+            ::continue::
         end
-
-        local function_ = object[function_name]
-        if not function_ then
-            function_name = string.format(" '%s'", function_name)
-            local message = ERROR_UNIMPLEMENTED_FUNCTION .. function_name
-            client:send(protocol.marshall_error(message))
-            client:close()
-            goto continue
-        end
-
-        client:send(protocol.marshall({function_(table.unpack(arguments))}))
-        client:close()
-
-        ::continue::
     end
 end
-
--- if #servants < 1 then return end -- ASK
-
--- -- select
--- local servantSockets = {}
--- for _, s in ipairs(servants) do
---     s:settimeout(1) -- ASK
---     table.insert(servantSockets, s)
--- end
--- local ready = sockets.wait(servantSockets)
-
--- -- getting the ready servant
--- for i, s in ipairs(servants) do
---     if ready == s then
---         ready = servants[i]
---         break
---     end
--- end
-
--- -- running the servant
--- local payload, err = ready.socket:receive()
--- assert(not err, err) -- ASK
 
 -----------------------------------------------------
 --

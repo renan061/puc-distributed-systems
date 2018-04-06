@@ -1,6 +1,14 @@
 local luarpc = require("luarpc")
 
-local proxy = luarpc.createProxy("0.0.0.0", 8080, "interface")
+-- catalogue
+local ip, port = "0.0.0.0", assert(arg[1])
+local catalogue = luarpc.createProxy(ip, port, "catalogue_interface")
+
+-- someinterface1
+local rpcerr, ip, port, err = catalogue.get("someinterface1")
+assert(not rpcerr, rpcerr)
+assert(not err, err)
+local proxy = luarpc.createProxy(ip, port, "interface")
 
 -- ok
 local err, number, string = proxy.foo(17.3, "foo", 2.7)

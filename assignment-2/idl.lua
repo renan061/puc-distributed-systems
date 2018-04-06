@@ -38,7 +38,7 @@ function idl.new(file)
     local t = {}
 
     local interface_object = parse(file)
-    -- ASK: does nothing with the interface name?
+    t.name = interface_object.name -- ASK: does nothing with the interface name?
     local methods = assert(interface_object.methods)
 
     for name, method in pairs(methods) do
@@ -55,11 +55,11 @@ function idl.new(file)
             local direction = assert(parameter.direction)
             validate_type(assert(parameter.type), false)
 
-            if direction == "in" then
+            if direction == idl.direction.in_ then
                 table.insert(parameter_types, parameter.type)
-            elseif direction == "out" then
+            elseif direction == idl.direction.out then
                 table.insert(return_types, parameter.type)
-            elseif direction == "inout" then
+            elseif direction == idl.direction.inout then
                 table.insert(parameter_types, parameter.type)
                 table.insert(return_types, parameter.type)
             else

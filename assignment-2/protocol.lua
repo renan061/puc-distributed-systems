@@ -1,11 +1,13 @@
 local protocol = {}
 
--- TODO: Escapar \n com \:-)\
+-- TODO: escapar \n com \:-)\
 
 protocol.error = "___ERRORPC: "
 
 -- "value1\nvalue2\nvalue3\n...\nvalueN\n"
 function protocol.marshall(values)
+    if #values == 0 then return "\n" end
+    
     local string = ""
     for _, value in ipairs(values) do
         string = string .. tostring(value) .. "\n"
