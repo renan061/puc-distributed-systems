@@ -1,0 +1,30 @@
+interface { name = catalogue,
+    methods = {
+        register = {
+            resulttype = "string",
+            args = {{
+                direction = "in",
+                type = "string"
+            }, {
+                direction = "in",
+                type = "double"
+            }, {
+                direction = "in",
+                type = "string"
+            }}
+        },
+        get = {
+            resulttype = "string",
+            args = {{
+                direction = "in",
+                type = "string"
+            }, {
+                direction = "out",
+                type = "double"
+            }, {
+                direction = "out",
+                type = "string"
+            }}
+        }
+    }
+}
