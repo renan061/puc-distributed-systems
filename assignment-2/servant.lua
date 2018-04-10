@@ -13,14 +13,13 @@ local obj = {
 local ip, port = "0.0.0.0", assert(arg[1])
 local catalogue = luarpc.createProxy(ip, port, "catalogue.interface")
 
--- someinterface1
-local ip, port = luarpc.createServant(obj, "interface.interface")
-local err = catalogue.register(ip, port, "someinterface1")
-assert(not err, err)
+function create_register_servant(interface_file, name)
+    local ip, port = luarpc.createServant(obj, interface_file)
+    local err = catalogue.register(ip, port, name)
+    assert(not err, err)
+end
 
--- someinterface2
-local ip, port = luarpc.createServant(obj, "interface.interface")
-local err = catalogue.register(ip, port, "someinterface2")
-assert(not err, err)
+create_register_servant("interface.interface", "someinterface1")
+create_register_servant("interface.interface", "someinterface2")
 
 luarpc.waitIncoming()

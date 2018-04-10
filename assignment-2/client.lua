@@ -66,3 +66,33 @@ assert(not value)
 local err, value = proxy.bar("somestring")
 assert(err == "luarpc error: can't convert 'somestring' to double", err)
 assert(not value)
+
+-- \n inside the message (1)
+local err, number, string = proxy.foo(-1, "string with \n new line", 1)
+assert(not err, err)
+assert(number == 0, string.format("%.1f != 0", number))
+assert(string == "string with \n new line is working", string)
+
+-- \n inside the message (2)
+local err, number, string = proxy.foo(0, "newline\n", 0)
+assert(not err, err)
+assert(number == 0, string.format("%.1f != 0", number))
+assert(string == "newline\n is working", string)
+
+-- \n inside the message (3)
+local err, number, string = proxy.foo(0, "newline\nn", 0)
+assert(not err, err)
+assert(number == 0, string.format("%.1f != 0", number))
+assert(string == "newline\nn is working", string)
+
+-- \n inside the message (4)
+local err, number, string = proxy.foo(0, "\\n\nn\\\n\n", 0)
+assert(not err, err)
+assert(number == 0, string.format("%.1f != 0", number))
+assert(string == "\\n\nn\\\n\n is working", string)
+
+-- smile inside the message
+local err, number, string = proxy.foo(0, "\\:-)\\", 0)
+assert(not err, err)
+assert(number == 0, string.format("%.1f != 0", number))
+assert(string == "\n is working", string)

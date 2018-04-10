@@ -38,7 +38,7 @@ function idl.new(file)
     local t = {}
 
     local interface_object = parse(file)
-    t.name = interface_object.name -- ASK: does nothing with the interface name?
+    t.name = interface_object.name -- ASK: do nothing with the interface name?
     local methods = assert(interface_object.methods)
 
     for name, method in pairs(methods) do
@@ -107,6 +107,7 @@ end
 --
 -----------------------------------------------------
 
+-- for debugging purposes
 function idl:string()
     local string = "interface {\n"
 

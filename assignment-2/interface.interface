@@ -1,4 +1,4 @@
-interface { name = "someinterface",
+interface { name = someinterface,
     methods = {
         foo = {
             resulttype = "double",

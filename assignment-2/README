@@ -1,0 +1,35 @@
+Os arquivos que formam a biblioteca luarpc são:
+    
+    - luarpc.lua
+    - idl.lua
+    - protocol.lua
+
+
+---
+
+
+Os seguintes arquivos compõe um exemplo usado como teste para a bilioteca:
+
+    - catalogue.interface
+    - interface.interface
+    - catalogue.lua
+    - client.lua
+    - server.lua
+
+
+Para rodar o exemplo, primeiro chame "lua catalogue.lua". O programa informará
+o IP e a porta do serviço do catálogo e ficará esperando por requisições. Em
+seguida, execute "lua servant.lua XXXXX", onde XXXXX é a porta do catálogo. O
+programa ficará esperando por requisições. Por fim, chame "lua client.lua
+XXXXX", onde XXXXX é a porta do catálogo. Se o programa chegar ao fim, passando
+por todas as assertivas, então o exemplo está funcionando corretamente.
+
+
+---
+
+
+DÚVIDAS:
+    - Nome (name) no arquivo da IDL inutilizado (sem aspas)?
+    - Bind sempre pra localhost? Não deveria ser configurável?
+    - Select com timeout? Documentação fala sobre bloqueios.
+    - Tratar erro que retorna do "select"?

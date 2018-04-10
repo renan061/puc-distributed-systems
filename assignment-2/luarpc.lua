@@ -134,9 +134,8 @@ end
 local servants = {}
 
 function luarpc.createServant(object, idl_file) -- returns ip, port
-    local socket = assert(socket.bind("*", 0))
-    -- TODO: settimeout ?
-    local ip, port = socket:getsockname()
+    local socket = assert(socket.bind("*", 0)) -- ASK: always localhost?
+    local ip, port = socket:getsockname() -- ASK: settimeout?
 
     table.insert(servants, {
         socket = socket,
@@ -193,7 +192,7 @@ function luarpc.waitIncoming()
 
     while true do
         local sockets, _, err = socket.select(sockets, nil)
-        assert(not err) -- ASK
+        assert(not err) -- ASK: should be an assertion?
 
         for i, socket in ipairs(sockets) do
             -- finds the corresponding servant for the socket
