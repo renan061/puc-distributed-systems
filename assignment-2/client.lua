@@ -96,3 +96,21 @@ local err, number, string = proxy.foo(0, "\\:-)\\", 0)
 assert(not err, err)
 assert(number == 0, string.format("%.1f != 0", number))
 assert(string == "\n is working", string)
+
+-- character
+local err, c1, c2 = proxy.character("0")
+assert(not err, err)
+assert(c1 == "1", c1)
+assert(c2 == "2", c2)
+
+-- empty string character
+local err, c1, c2 = proxy.character("")
+assert(not err, err)
+assert(c1 == "0", c1)
+assert(c2 == "1", c2)
+
+-- character type but string value
+local err, c1, c2 = proxy.character("01")
+assert(err == "luarpc error: '01' is not a valid character", err)
+assert(not c1, c1)
+assert(not c2, c2)

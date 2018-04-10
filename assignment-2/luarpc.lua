@@ -82,9 +82,11 @@ function luarpc.createProxy(ip, port, idl_file)
             -- adds missing arguments with zero values
             for i = #arguments + 1, #method.parameter_types do
                 local parameter_type = method.parameter_types[i]
-                if parameter_type == "double" then
+                if parameter_type == idl.type.double then
                     table.insert(arguments, 0.0)
-                elseif parameter_type == "string" then
+                elseif parameter_type == idl.type.string then
+                    table.insert(arguments, "")
+                elseif parameter_type == idl.type.char then
                     table.insert(arguments, "")
                 else
                     error("internal error: invalid interface type")

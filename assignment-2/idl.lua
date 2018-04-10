@@ -4,7 +4,8 @@ idl.__index = idl
 -- types
 idl.type = {
     double = "double",
-    string = "string"
+    string = "string",
+    char = "char"
 }
 
 -- directions
@@ -23,9 +24,14 @@ function parse(file)
 end
 
 -- validates an idl type
-local function validate_type(t, canvoid)
-    if t == "void" then assert(canvoid, "invalid type void for parameter")
-    else assert(t == "double" or t == "string", "invalid type " .. t) end
+local function validate_type(t, can_void)
+    if t == "void" then
+        assert(can_void, "invalid type void for parameter")
+    else
+        assert(
+            t == "double" or t == "string" or t == "char", "invalid type " .. t
+        )
+    end
 end
 
 -----------------------------------------------------
@@ -89,13 +95,20 @@ function idl.convert_value(value, idl_type) -- returns value, error
         convert = tonumber
     elseif idl_type == idl.type.string then
         convert = tostring
+    elseif idl_type == idl.type.char then
+        convert = tostring
     else
         error("invalid interface type - " .. idl_type)
     end
 
     local converted = convert(value)
+
     if not converted then
         return nil, string.format("can't convert '%s' to %s", value, idl_type)
+    end
+
+    if idl_type == idl.type.char and converted:len() > 1 then
+        return nil, string.format("'%s' is not a valid character", value)
     end
 
     return converted    

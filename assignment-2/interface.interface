@@ -29,6 +29,13 @@ interface { name = someinterface,
                 direction = "inout",
                 type = "double"
             }}
+        },
+        character = {
+            resulttype = "char",
+            args = {{
+                direction = "inout",
+                type = "char"
+            }}
         }
     }
 }

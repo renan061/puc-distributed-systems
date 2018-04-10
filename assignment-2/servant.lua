@@ -2,10 +2,17 @@ local luarpc = require("luarpc")
 
 local obj = {
     foo = function(left, message, right)
-        return left + right, message .. " is working"
+        return left + right, message .. " is working"    
     end,
     bar = function(number)
         return number + 10
+    end,
+    character = function(c)
+        local number = tonumber(c)
+        if not number then return 0, 1 end
+        local c1 = string.format("%d", tostring(number) + 1)
+        local c2 = string.format("%d", tostring(number) + 2)
+        return c1, c2
     end
 }
 
