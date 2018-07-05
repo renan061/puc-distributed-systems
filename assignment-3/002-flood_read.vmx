@@ -1,0 +1,697 @@
+199 696 4 4 0 0 32 5 32
+00 | 00000 0 track 0
+00 | 00001 0
+00 | 00002 0
+00 | 00003 0
+00 | 00004 0 track 1
+00 | 00005 0
+00 | 00006 0
+00 | 00007 0
+00 | 00008 0 track 2
+00 | 00009 0
+00 | 00010 0
+00 | 00011 0
+00 | 00012 0 track 3
+00 | 00013 0
+00 | 00014 0
+00 | 00015 0
+00 | 00016 0 track 4
+00 | 00017 0
+00 | 00018 0
+00 | 00019 0
+00 | 00020 0000 wClock 0
+00 | 00021 0001
+00 | 00022 0002
+00 | 00023 0003
+00 | 00024 0004
+00 | 00025 0005
+00 | 00026 0006
+00 | 00027 0007
+00 | 00028 0008 wClock 1
+00 | 00029 0009
+00 | 00030 0010
+00 | 00031 0011
+00 | 00032 0012
+00 | 00033 0013
+00 | 00034 0014
+00 | 00035 0015
+00 | 00036 0016 wClock 2
+00 | 00037 0017
+00 | 00038 0018
+00 | 00039 0019
+00 | 00040 0020
+00 | 00041 0021
+00 | 00042 0022
+00 | 00043 0023
+00 | 00044 0024 wClock 3
+00 | 00045 0025
+00 | 00046 0026
+00 | 00047 0027
+00 | 00048 0028
+00 | 00049 0029
+00 | 00050 0030
+00 | 00051 0031
+00 | 00052 0032 inEvt 005 : TEMP
+00 | 00053 0033           : 01 gates
+00 | 00054 0034
+00 | 00055 0035
+00 | 00056 0036 inEvt 006 : PHOTO
+00 | 00057 0037           : 01 gates
+00 | 00058 0038
+00 | 00059 0039
+00 | 00060 0040 inEvt 041 : SEND_DONE
+00 | 00061 0041           : 05 gates
+00 | 00062 0042
+00 | 00063 0043
+00 | 00064 0044
+00 | 00065 0045
+00 | 00066 0046
+00 | 00067 0047
+00 | 00068 0048
+00 | 00069 0049
+00 | 00070 0050
+00 | 00071 0051
+00 | 00072 0052 inEvt 044 : RECEIVE()
+00 | 00073 0053           : 03 gates
+00 | 00074 0054
+00 | 00075 0055
+00 | 00076 0056
+00 | 00077 0057
+00 | 00078 0058
+00 | 00079 0059
+00 | 00080 0060
+00 | 00081 0061
+00 | 00082 0062
+00 | 00083 0063 inEvt 046 : Q_READY
+00 | 00084 0064           : 02 gates
+00 | 00085 0065
+00 | 00086 0066
+00 | 00087 0067
+00 | 00088 0068
+00 | 00089 0069 $ret:1, 
+00 | 00090 0070 id:2, 
+00 | 00091 0071 
+00 | 00092 0072 initialRoute:2, 
+00 | 00093 0073 
+00 | 00094 0074 currentFlood:25, 
+00 | 00095 0075 
+00 | 00096 0076 
+00 | 00097 0077 
+00 | 00098 0078 
+00 | 00099 0079 
+00 | 00100 0080 
+00 | 00101 0081 
+00 | 00102 0082 
+00 | 00103 0083 
+00 | 00104 0084 
+00 | 00105 0085 
+00 | 00106 0086 
+00 | 00107 0087 
+00 | 00108 0088 
+00 | 00109 0089 
+00 | 00110 0090 
+00 | 00111 0091 
+00 | 00112 0092 
+00 | 00113 0093 
+00 | 00114 0094 
+00 | 00115 0095 
+00 | 00116 0096 
+00 | 00117 0097 
+00 | 00118 0098 
+00 | 00119 0099 alr:25, 
+00 | 00120 0100 
+00 | 00121 0101 
+00 | 00122 0102 
+00 | 00123 0103 
+00 | 00124 0104 
+00 | 00125 0105 
+00 | 00126 0106 
+00 | 00127 0107 
+00 | 00128 0108 
+00 | 00129 0109 
+00 | 00130 0110 
+00 | 00131 0111 
+00 | 00132 0112 
+00 | 00133 0113 
+00 | 00134 0114 
+00 | 00135 0115 
+00 | 00136 0116 
+00 | 00137 0117 
+00 | 00138 0118 
+00 | 00139 0119 
+00 | 00140 0120 
+00 | 00141 0121 
+00 | 00142 0122 
+00 | 00143 0123 
+00 | 00144 0124 stat:1, 
+00 | 00145 0125 rec:25, 
+00 | 00146 0126 
+00 | 00147 0127 
+00 | 00148 0128 
+00 | 00149 0129 
+00 | 00150 0130 
+00 | 00151 0131 
+00 | 00152 0132 
+00 | 00153 0133 
+00 | 00154 0134 
+00 | 00155 0135 
+00 | 00156 0136 
+00 | 00157 0137 
+00 | 00158 0138 
+00 | 00159 0139 
+00 | 00160 0140 
+00 | 00161 0141 
+00 | 00162 0142 
+00 | 00163 0143 
+00 | 00164 0144 
+00 | 00165 0145 
+00 | 00166 0146 
+00 | 00167 0147 
+00 | 00168 0148 
+00 | 00169 0149 
+00 | 00170 0150 myAlarm:25, 
+00 | 00171 0151 
+00 | 00172 0152 
+00 | 00173 0153 
+00 | 00174 0154 
+00 | 00175 0155 
+00 | 00176 0156 
+00 | 00177 0157 
+00 | 00178 0158 
+00 | 00179 0159 
+00 | 00180 0160 
+00 | 00181 0161 
+00 | 00182 0162 
+00 | 00183 0163 
+00 | 00184 0164 
+00 | 00185 0165 
+00 | 00186 0166 
+00 | 00187 0167 
+00 | 00188 0168 
+00 | 00189 0169 
+00 | 00190 0170 
+00 | 00191 0171 
+00 | 00192 0172 
+00 | 00193 0173 
+00 | 00194 0174 
+00 | 00195 0175 tv:2, 
+00 | 00196 0176 
+00 | 00197 0177 pv:2, 
+00 | 00198 0178 
+d1 | 00199 d1 set_c ushort 32 1281          | config gate TEMP with 1 await(s) - 0x0501 = 1281
+20 | 00200 20 
+05 | 00201 05 
+01 | 00202 01 
+d1 | 00203 d1 set_c ushort 36 1537          | config gate PHOTO with 1 await(s) - 0x0601 = 1537
+24 | 00204 24 
+06 | 00205 06 
+01 | 00206 01 
+d1 | 00207 d1 set_c ushort 40 10501         | config gate SEND_DONE with 5 await(s) - 0x2905 = 10501
+28 | 00208 28 
+29 | 00209 29 
+05 | 00210 05 
+d1 | 00211 d1 set_c ushort 52 11395         | config gate RECEIVE() with 3 await(s) - 0x2c83 = 11395
+34 | 00212 34 
+2c | 00213 2c 
+83 | 00214 83 
+d1 | 00215 d1 set_c ushort 63 11778         | config gate Q_READY with 2 await(s) - 0x2e02 = 11778
+3f | 00216 3f 
+2e | 00217 2e 
+02 | 00218 02 
+24 | 00219 24 func 0                        | func getNodeId
+00 | 00220 00 
+a1 | 00221 a1 pop ushort 70                 | pop id
+46 | 00222 46 
+c1 | 00223 c1 set_c ushort 72 0             | initialRoute = 0
+48 | 00224 48 
+00 | 00225 00 
+40 | 00226 40 push_c 11                     | push 11
+0b | 00227 0b 
+91 | 00228 91 push_v ushort 70              | push id:ushort
+46 | 00229 46 
+0f | 00230 0f eq                            | eq
+4f | 00231 4f ifelse 134 135                | ifelse True_134 False_135
+00 | 00232 .00 addr:236
+ec | 00233 .86 
+01 | 00234 .00 addr:419
+a3 | 00235 .87 
+2a | 00236 2a set_v ushort 81 ushort 72     | currentFlood.route = initialRoute
+11 | 00237 11 
+51 | 00238 51 
+48 | 00239 48 
+89 | 00240 89 tkins_max 0 9                 | insert track ParEver_sub_1_9
+00 | 00241 .00 addr:250
+fa | 00242 .09 
+89 | 00243 89 tkins_max 0 10                | insert track ParEver_sub_2_10
+01 | 00244 .00 addr:292
+24 | 00245 .0a 
+89 | 00246 89 tkins_max 0 11                | insert track ParEver_sub_3_11
+01 | 00247 .00 addr:346
+5a | 00248 .0b 
+01 | 00249 01 end                           | end
+40 | 00250 40 push_c 5                      | push 5
+05 | 00251 05 
+a0 | 00252 a0 pop ubyte 54                  | evt RECEIVE() auxId = pop
+36 | 00253 36 
+d1 | 00254 d1 set_c ushort 55 18            | await RECEIVE()[0]
+37 | 00255 37 
+01 | 00256 .00 addr:259
+03 | 00257 .12 
+01 | 00258 01 end                           | end
+5c | 00259 5c getextdt_v 99 25              | getExtData alr 25
+63 | 00260 63 
+19 | 00261 19 
+40 | 00262 40 push_c 99                     | push_c &alr:alarmMsg
+63 | 00263 63 
+24 | 00264 24 func 10                       | func qPut
+0a | 00265 0a 
+a0 | 00266 a0 pop ubyte 124                 | pop stat
+7c | 00267 7c 
+58 | 00268 58 outevt_c 5 7                  | emit LEDS len=1 const=7
+05 | 00269 05 
+07 | 00270 07 
+29 | 00271 29 clken_c 0 1000 21             | clock enable Awake_1000_21 1000msec
+03 | 00272 03 
+00 | 00273 00 
+03 | 00274 03 
+e8 | 00275 e8 
+01 | 00276 .00 addr:279
+17 | 00277 .15 
+01 | 00278 01 end                           | end
+58 | 00279 58 outevt_c 5 0                  | emit LEDS len=1 const=0
+05 | 00280 05 
+00 | 00281 00 
+39 | 00282 39 exec 15                       | goto  15
+00 | 00283 .00 addr:250
+fa | 00284 .0f 
+48 | 00285 48 memclr 0 8                    | clear WClocks gates from 0 to 1
+00 | 00286 00 
+08 | 00287 08 
+48 | 00288 48 memclr 54 2                   | clear EXT gates for RECEIVE()
+36 | 00289 36 
+02 | 00290 02 
+01 | 00291 01 end                           | end
+2a | 00292 2a set_v ushort 79 ushort 70     | currentFlood.origin = id
+11 | 00293 11 
+4f | 00294 4f 
+46 | 00295 46 
+40 | 00296 40 push_c 1                      | push 1
+01 | 00297 01 
+91 | 00298 91 push_v ushort 81                     | push currentFlood.route [Optm:: push_c addr + deref]
+51 | 00299 51 
+06 | 00300 06 add                           | add
+a1 | 00301 a1 pop ushort 81                 | pop currentFlood.route
+51 | 00302 51 
+c1 | 00303 c1 set_c ushort 83 0             | currentFlood.jumps = 0
+53 | 00304 53 
+00 | 00305 00 
+2a | 00306 2a set_v ushort 75 ushort 70     | currentFlood.source = id
+11 | 00307 11 
+4b | 00308 4b 
+46 | 00309 46 
+c0 | 00310 c0 set_c ubyte 74 3              | currentFlood.type = 3
+4a | 00311 4a 
+03 | 00312 03 
+d1 | 00313 d1 set_c ushort 77 0xffff        | currentFlood.target = 0xffff
+4d | 00314 4d 
+ff | 00315 ff 
+ff | 00316 ff 
+58 | 00317 58 outevt_c 5 7                  | emit LEDS len=1 const=7
+05 | 00318 05 
+07 | 00319 07 
+b1 | 00320 b1 outevt_v 40 74                | emit SEND len=25 var=currentFlood
+28 | 00321 28 
+4a | 00322 4a 
+d1 | 00323 d1 set_c ushort 42 35            | await SEND_DONE[0]
+2a | 00324 2a 
+01 | 00325 .00 addr:328
+48 | 00326 .23 
+01 | 00327 01 end                           | end
+58 | 00328 58 outevt_c 5 0                  | emit LEDS len=1 const=0
+05 | 00329 05 
+00 | 00330 00 
+29 | 00331 29 clken_c 1 60000 38            | clock enable Awake_60000_38 60000msec
+03 | 00332 03 
+01 | 00333 01 
+ea | 00334 ea 
+60 | 00335 60 
+01 | 00336 .00 addr:292
+24 | 00337 .18 
+01 | 00338 01 end                           | end
+48 | 00339 48 memclr 8 8                    | clear WClocks gates from 1 to 2
+08 | 00340 08 
+08 | 00341 08 
+48 | 00342 48 memclr 42 2                   | clear EXT gates for SEND_DONE
+2a | 00343 2a 
+02 | 00344 02 
+01 | 00345 01 end                           | end
+d1 | 00346 d1 set_c ushort 65 42            | await Q_READY[0]
+41 | 00347 41 
+01 | 00348 .00 addr:351
+5f | 00349 .2a 
+01 | 00350 01 end                           | end
+40 | 00351 40 push_c 99                     | push_c &alr:alarmMsg
+63 | 00352 63 
+24 | 00353 24 func 11                       | func qGet
+0b | 00354 0b 
+a0 | 00355 a0 pop ubyte 124                 | pop stat
+7c | 00356 7c 
+c1 | 00357 c1 set_c ushort 102 1            | alr.target = 1
+66 | 00358 66 
+01 | 00359 01 
+b1 | 00360 b1 outevt_v 40 99                | emit SEND len=25 var=alr
+28 | 00361 28 
+63 | 00362 63 
+d1 | 00363 d1 set_c ushort 44 49            | await SEND_DONE[1]
+2c | 00364 2c 
+01 | 00365 .00 addr:368
+70 | 00366 .31 
+01 | 00367 01 end                           | end
+58 | 00368 58 outevt_c 5 4                  | emit LEDS len=1 const=4
+05 | 00369 05 
+04 | 00370 04 
+29 | 00371 29 clken_c 2 2000 52             | clock enable Awake_2000_52 2000msec
+03 | 00372 03 
+02 | 00373 02 
+07 | 00374 07 
+d0 | 00375 d0 
+01 | 00376 .00 addr:379
+7b | 00377 .34 
+01 | 00378 01 end                           | end
+58 | 00379 58 outevt_c 5 0                  | emit LEDS len=1 const=0
+05 | 00380 05 
+00 | 00381 00 
+40 | 00382 40 push_c 0                      | push 0
+00 | 00383 00 
+24 | 00384 24 func 12                       | func qSize
+0c | 00385 0c 
+0f | 00386 0f eq                            | eq
+4f | 00387 4f ifelse 55 56                  | ifelse True_55 EndIf_56
+01 | 00388 .00 addr:392
+88 | 00389 .37 
+01 | 00390 .00 addr:351
+5f | 00391 .2b 
+3d | 00392 3d tkins_z 1 12 45               | insert track Loop_out_45 tree 12
+8c | 00393 8c 
+01 | 00394 .00 addr:400
+90 | 00395 .2d 
+01 | 00396 01 end                           | end
+39 | 00397 39 exec 56                       | goto  56
+01 | 00398 .00 addr:351
+5f | 00399 .2b 
+48 | 00400 48 memclr 16 8                   | clear WClocks gates from 2 to 3
+10 | 00401 10 
+08 | 00402 08 
+48 | 00403 48 memclr 42 2                   | clear EXT gates for SEND_DONE
+2a | 00404 2a 
+02 | 00405 02 
+39 | 00406 39 exec 39                       | goto  39
+01 | 00407 .00 addr:346
+5a | 00408 .27 
+48 | 00409 48 memclr 16 8                   | clear WClocks gates from 2 to 3
+10 | 00410 10 
+08 | 00411 08 
+48 | 00412 48 memclr 42 2                   | clear EXT gates for SEND_DONE
+2a | 00413 2a 
+02 | 00414 02 
+48 | 00415 48 memclr 65 2                   | clear EXT gates for Q_READY
+41 | 00416 41 
+02 | 00417 02 
+01 | 00418 01 end                           | end
+2a | 00419 2a set_v ushort 81 ushort 72     | currentFlood.route = initialRoute
+11 | 00420 11 
+51 | 00421 51 
+48 | 00422 48 
+2a | 00423 2a set_v ushort 75 ushort 70     | currentFlood.source = id
+11 | 00424 11 
+4b | 00425 4b 
+46 | 00426 46 
+89 | 00427 89 tkins_max 0 59                | insert track ParEver_sub_1_59
+01 | 00428 .00 addr:440
+b8 | 00429 .3b 
+89 | 00430 89 tkins_max 0 60                | insert track ParEver_sub_2_60
+02 | 00431 .00 addr:534
+16 | 00432 .3c 
+89 | 00433 89 tkins_max 0 61                | insert track ParEver_sub_3_61
+02 | 00434 .00 addr:559
+2f | 00435 .3d 
+89 | 00436 89 tkins_max 0 62                | insert track ParEver_sub_4_62
+02 | 00437 .00 addr:616
+68 | 00438 .3e 
+01 | 00439 01 end                           | end
+40 | 00440 40 push_c 3                      | push 3
+03 | 00441 03 
+a0 | 00442 a0 pop ubyte 57                  | evt RECEIVE() auxId = pop
+39 | 00443 39 
+d1 | 00444 d1 set_c ushort 58 69            | await RECEIVE()[1]
+3a | 00445 3a 
+01 | 00446 .00 addr:449
+c1 | 00447 .45 
+01 | 00448 01 end                           | end
+5c | 00449 5c getextdt_v 125 25             | getExtData rec 25
+7d | 00450 7d 
+19 | 00451 19 
+26 | 00452 26 outevt_z 10                   | emit REQ_PHOTO
+0a | 00453 0a 
+d1 | 00454 d1 set_c ushort 38 72            | await PHOTO[0]
+26 | 00455 26 
+01 | 00456 .00 addr:459
+cb | 00457 .48 
+01 | 00458 01 end                           | end
+5c | 00459 5c getextdt_v 177 2              | getExtData pv 2
+b1 | 00460 b1 
+02 | 00461 02 
+41 | 00462 41 push_c 400                    | push 400
+01 | 00463 01 
+90 | 00464 90 
+91 | 00465 91 push_v ushort 177             | push pv:ushort
+b1 | 00466 b1 
+12 | 00467 12 lte                           | lte
+4f | 00468 4f ifelse 91 92                  | ifelse True_91 EndIf_92
+01 | 00469 .00 addr:473
+d9 | 00470 .5b 
+01 | 00471 .00 addr:440
+b8 | 00472 .42 
+91 | 00473 91 push_v ushort 81                     | push currentFlood.route [Optm:: push_c addr + deref]
+51 | 00474 51 
+91 | 00475 91 push_v ushort 132                    | push rec.route [Optm:: push_c addr + deref]
+84 | 00476 84 
+13 | 00477 13 gt                            | gt
+4f | 00478 4f ifelse 89 90                  | ifelse True_89 EndIf_90
+01 | 00479 .00 addr:483
+e3 | 00480 .59 
+01 | 00481 .00 addr:440
+b8 | 00482 .42 
+91 | 00483 91 push_v ushort 81                     | push currentFlood.route [Optm:: push_c addr + deref]
+51 | 00484 51 
+25 | 00485 25 outevt_e 5                    | emit LEDS
+05 | 00486 05 
+2a | 00487 2a set_v ushort 79 ushort 126    | currentFlood.origin = rec.source
+11 | 00488 11 
+4f | 00489 4f 
+7e | 00490 7e 
+40 | 00491 40 push_c 1                      | push 1
+01 | 00492 01 
+91 | 00493 91 push_v ushort 134                    | push rec.jumps [Optm:: push_c addr + deref]
+86 | 00494 86 
+06 | 00495 06 add                           | add
+a1 | 00496 a1 pop ushort 83                 | pop currentFlood.jumps
+53 | 00497 53 
+2a | 00498 2a set_v ushort 81 ushort 132    | currentFlood.route = rec.route
+11 | 00499 11 
+51 | 00500 51 
+84 | 00501 84 
+c0 | 00502 c0 set_c ubyte 74 3              | currentFlood.type = 3
+4a | 00503 4a 
+03 | 00504 03 
+d1 | 00505 d1 set_c ushort 77 0xffff        | currentFlood.target = 0xffff
+4d | 00506 4d 
+ff | 00507 ff 
+ff | 00508 ff 
+b1 | 00509 b1 outevt_v 40 74                | emit SEND len=25 var=currentFlood
+28 | 00510 28 
+4a | 00511 4a 
+d1 | 00512 d1 set_c ushort 46 85            | await SEND_DONE[2]
+2e | 00513 2e 
+02 | 00514 .00 addr:517
+05 | 00515 .55 
+01 | 00516 01 end                           | end
+91 | 00517 91 push_v ushort 81                     | push currentFlood.route [Optm:: push_c addr + deref]
+51 | 00518 51 
+25 | 00519 25 outevt_e 5                    | emit LEDS
+05 | 00520 05 
+39 | 00521 39 exec 90                       | goto  90
+01 | 00522 .00 addr:440
+b8 | 00523 .42 
+48 | 00524 48 memclr 38 2                   | clear EXT gates for PHOTO
+26 | 00525 26 
+02 | 00526 02 
+48 | 00527 48 memclr 42 2                   | clear EXT gates for SEND_DONE
+2a | 00528 2a 
+02 | 00529 02 
+48 | 00530 48 memclr 54 2                   | clear EXT gates for RECEIVE()
+36 | 00531 36 
+02 | 00532 02 
+01 | 00533 01 end                           | end
+40 | 00534 40 push_c 5                      | push 5
+05 | 00535 05 
+a0 | 00536 a0 pop ubyte 60                  | evt RECEIVE() auxId = pop
+3c | 00537 3c 
+d1 | 00538 d1 set_c ushort 61 96            | await RECEIVE()[2]
+3d | 00539 3d 
+02 | 00540 .00 addr:543
+1f | 00541 .60 
+01 | 00542 01 end                           | end
+5c | 00543 5c getextdt_v 99 25              | getExtData alr 25
+63 | 00544 63 
+19 | 00545 19 
+40 | 00546 40 push_c 99                     | push_c &alr:alarmMsg
+63 | 00547 63 
+24 | 00548 24 func 10                       | func qPut
+0a | 00549 0a 
+a0 | 00550 a0 pop ubyte 124                 | pop stat
+7c | 00551 7c 
+39 | 00552 39 exec 93                       | goto  93
+02 | 00553 .00 addr:534
+16 | 00554 .5d 
+48 | 00555 48 memclr 54 2                   | clear EXT gates for RECEIVE()
+36 | 00556 36 
+02 | 00557 02 
+01 | 00558 01 end                           | end
+d1 | 00559 d1 set_c ushort 67 100           | await Q_READY[1]
+43 | 00560 43 
+02 | 00561 .00 addr:564
+34 | 00562 .64 
+01 | 00563 01 end                           | end
+40 | 00564 40 push_c 99                     | push_c &alr:alarmMsg
+63 | 00565 63 
+24 | 00566 24 func 11                       | func qGet
+0b | 00567 0b 
+a0 | 00568 a0 pop ubyte 124                 | pop stat
+7c | 00569 7c 
+c0 | 00570 c0 set_c ubyte 99 5              | alr.type = 5
+63 | 00571 63 
+05 | 00572 05 
+2a | 00573 2a set_v ushort 102 ushort 79    | alr.target = currentFlood.origin
+11 | 00574 11 
+66 | 00575 66 
+4f | 00576 4f 
+b1 | 00577 b1 outevt_v 40 99                | emit SEND len=25 var=alr
+28 | 00578 28 
+63 | 00579 63 
+d1 | 00580 d1 set_c ushort 48 108           | await SEND_DONE[3]
+30 | 00581 30 
+02 | 00582 .00 addr:585
+49 | 00583 .6c 
+01 | 00584 01 end                           | end
+40 | 00585 40 push_c 0                      | push 0
+00 | 00586 00 
+24 | 00587 24 func 12                       | func qSize
+0c | 00588 0c 
+0f | 00589 0f eq                            | eq
+4f | 00590 4f ifelse 109 110                | ifelse True_109 EndIf_110
+02 | 00591 .00 addr:595
+53 | 00592 .6d 
+02 | 00593 .00 addr:564
+34 | 00594 .65 
+3d | 00595 3d tkins_z 1 12 103              | insert track Loop_out_103 tree 12
+8c | 00596 8c 
+02 | 00597 .00 addr:603
+5b | 00598 .67 
+01 | 00599 01 end                           | end
+39 | 00600 39 exec 110                      | goto  110
+02 | 00601 .00 addr:564
+34 | 00602 .65 
+48 | 00603 48 memclr 42 2                   | clear EXT gates for SEND_DONE
+2a | 00604 2a 
+02 | 00605 02 
+39 | 00606 39 exec 97                       | goto  97
+02 | 00607 .00 addr:559
+2f | 00608 .61 
+48 | 00609 48 memclr 42 2                   | clear EXT gates for SEND_DONE
+2a | 00610 2a 
+02 | 00611 02 
+48 | 00612 48 memclr 65 2                   | clear EXT gates for Q_READY
+41 | 00613 41 
+02 | 00614 02 
+01 | 00615 01 end                           | end
+26 | 00616 26 outevt_z 9                    | emit REQ_TEMP
+09 | 00617 09 
+d1 | 00618 d1 set_c ushort 34 116           | await TEMP[0]
+22 | 00619 22 
+02 | 00620 .00 addr:623
+6f | 00621 .74 
+01 | 00622 01 end                           | end
+5c | 00623 5c getextdt_v 175 2              | getExtData tv 2
+af | 00624 af 
+02 | 00625 02 
+41 | 00626 41 push_c 500                    | push 500
+01 | 00627 01 
+f4 | 00628 f4 
+91 | 00629 91 push_v ushort 175             | push tv:ushort
+af | 00630 af 
+13 | 00631 13 gt                            | gt
+4f | 00632 4f ifelse 130 131                | ifelse True_130 False_131
+02 | 00633 .00 addr:637
+7d | 00634 .82 
+02 | 00635 .00 addr:667
+9b | 00636 .83 
+58 | 00637 58 outevt_c 8 1                  | emit LED2 len=1 const=1
+08 | 00638 08 
+01 | 00639 01 
+2a | 00640 2a set_v ushort 151 ushort 70    | myAlarm.source = id
+11 | 00641 11 
+97 | 00642 97 
+46 | 00643 46 
+2a | 00644 2a set_v ushort 157 ushort 175   | myAlarm.temp = tv
+11 | 00645 11 
+9d | 00646 9d 
+af | 00647 af 
+2a | 00648 2a set_v ushort 155 ushort 70    | myAlarm.node = id
+11 | 00649 11 
+9b | 00650 9b 
+46 | 00651 46 
+c0 | 00652 c0 set_c ubyte 150 5             | myAlarm.type = 5
+96 | 00653 96 
+05 | 00654 05 
+2a | 00655 2a set_v ushort 153 ushort 79    | myAlarm.target = currentFlood.origin
+11 | 00656 11 
+99 | 00657 99 
+4f | 00658 4f 
+b1 | 00659 b1 outevt_v 40 150               | emit SEND len=25 var=myAlarm
+28 | 00660 28 
+96 | 00661 96 
+d1 | 00662 d1 set_c ushort 50 127           | await SEND_DONE[4]
+32 | 00663 32 
+02 | 00664 .00 addr:673
+a1 | 00665 .84 
+01 | 00666 01 end                           | end
+58 | 00667 58 outevt_c 8 0                  | emit LED2 len=1 const=0
+08 | 00668 08 
+00 | 00669 00 
+39 | 00670 39 exec 132                      | goto  132
+02 | 00671 .00 addr:673
+a1 | 00672 .84 
+29 | 00673 29 clken_c 3 10000 133           | clock enable Awake_10000_133 10000msec
+03 | 00674 03 
+03 | 00675 03 
+27 | 00676 27 
+10 | 00677 10 
+02 | 00678 .00 addr:616
+68 | 00679 .6f 
+01 | 00680 01 end                           | end
+48 | 00681 48 memclr 24 8                   | clear WClocks gates from 3 to 4
+18 | 00682 18 
+08 | 00683 08 
+48 | 00684 48 memclr 34 2                   | clear EXT gates for TEMP
+22 | 00685 22 
+02 | 00686 02 
+48 | 00687 48 memclr 42 2                   | clear EXT gates for SEND_DONE
+2a | 00688 2a 
+02 | 00689 02 
+01 | 00690 01 end                           | end
+01 | 00691 01 end                           | end
+48 | 00692 48 memclr 0 32                   | clear WClocks gates from 0 to 4
+00 | 00693 00 
+20 | 00694 20 
+01 | 00695 01 end                           | end

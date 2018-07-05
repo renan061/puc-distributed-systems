@@ -1,0 +1,58 @@
+#include "/home/terra/TerraNG/terra/TerraNet.defs"
+
+var ushort id = getNodeId();
+
+var ushort initialRoute = 0;
+
+pktype floodMsg from radioMsg with
+    var ushort origin; // parent node id
+    var ushort route;  // current known route
+    var ushort jumps;  // current number of jumps to root
+end
+
+var floodMsg currentFlood;
+var floodMsg rec;
+
+if id == 11 then //Is gateway
+    //flood every 1min
+    currentFlood.origin = id;
+    currentFlood.route = initialRoute + 1;
+    currentFlood.jumps = 0;
+    currentFlood.source = id;
+    currentFlood.target = BROADCAST;
+    loop do
+        emit LEDS(7);
+        emit SEND(currentFlood);
+        await SEND_DONE;
+        emit LEDS(1);
+        await 10s;
+        emit LEDS(0);
+        currentFlood.route = currentFlood.route + 1;
+    end
+else //everyone else
+    //respond to flood
+    currentFlood.origin = id;
+    currentFlood.route = initialRoute;
+    currentFlood.jumps = 0;
+    currentFlood.source = id;
+    var ushort tv;
+    loop do
+        rec = await RECEIVE;
+        emit REQ_TEMP(); //DEBUG
+        tv = await TEMP; //DEBUG
+        if tv <= 500 then //DEBUG
+            if rec.route > currentFlood.route then // send to others
+                emit LEDS(currentFlood.route); //DEBUG
+                currentFlood.origin = rec.origin;
+                currentFlood.jumps = rec.jumps + 1;
+                currentFlood.route = rec.route;
+                currentFlood.target = BROADCAST;
+                emit SEND(currentFlood);
+                await SEND_DONE;
+                await 2s; //DEBUG
+                emit LEDS(currentFlood.route); //DEBUG
+            end
+        end //DEBUG
+    end
+end
+

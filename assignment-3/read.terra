@@ -1,0 +1,23 @@
+#include "/home/terra/TerraNG/terra/TerraNet.defs"
+
+var ushort tv;
+var ushort max = 500;
+
+loop do
+    par/or do
+        emit REQ_TEMP();
+        tv = await TEMP;
+    with
+        await 200ms;
+    end
+
+    if tv > max then
+        emit LED2(ON);
+        // TODO: alarme raiz
+        await 500ms;
+        emit LED2(OFF);
+    end
+
+    await 100ms;
+end
+

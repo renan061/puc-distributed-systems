@@ -1,0 +1,21 @@
+#include "/home/terra/TerraNG/terra/TerraNet.defs"
+
+var ushort tv;
+
+loop do
+    par/or do
+        emit REQ_TEMP();
+        tv = await TEMP;
+    with
+        await 200ms;
+    end
+
+    if tv > 500 then
+        emit LED2(ON);
+    else
+        emit LED2(OFF);
+    end
+
+	await 100ms;
+end
+

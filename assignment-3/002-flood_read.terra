@@ -1,0 +1,199 @@
+#include "/home/terra/TerraNG/terra/TerraNet.defs"
+
+#define FLOOD_TYPE 3
+#define ALARM_TYPE 5
+
+var ushort node_id = getNodeId();
+
+var ushort initial_route = 0;
+
+pktype t_msg from radioMsg with
+    var ushort ushort_01; // parent node id OR node that measured the temp value
+    var ushort ushort_02; // current known route OR temperature value
+    var ushort ushort_03; // current number of jumps to root
+end
+
+var t_msg msg_flood;
+var t_msg msg_radio;
+
+var ubyte stat;
+var ubyte ack;
+
+
+if node_id == 11 then //Is gateway
+/*----------------------------------------------------------------------------*/
+/*-------------- This is the code running on the gateway node (11) -----------*/
+/*----------------------------------------------------------------------------*/
+    par do
+    /* Flood the network to make paths */
+        msg_flood.ushort_02 = initial_route;
+        loop do
+            //flood every 1min
+            msg_flood.ushort_01 = node_id;
+            msg_flood.ushort_02 = msg_flood.ushort_02 + 1;
+            msg_flood.ushort_03 = 0;
+            msg_flood.source = node_id;
+            msg_flood.type = FLOOD_TYPE;
+            msg_flood.target = BROADCAST;
+            emit LEDS(0);
+            emit LEDS(7);
+            stat = qPut(msg_flood);
+            emit LEDS(0);
+            await 1min;
+        end
+    with
+    /* Receive alarm */
+        loop do
+            // receive alarm msg (we need to send it to node 1)
+            msg_radio = await RECEIVE(ALARM_TYPE);
+            stat = qPut(msg_radio);
+        end
+    with
+    /* Send message */
+        var ubyte counter; // try to send alarm message to node 1 5 times
+        loop do
+            await Q_READY;
+            loop do
+                if qSize() > 0 then
+                    stat = qGet(msg_radio);
+                    counter = 0;
+                    
+                    if msg_radio.target == BROADCAST then
+                    /* this is a flood message and we just send it */
+                        emit SEND(msg_radio);
+                        await SEND_DONE(msg_radio.type);
+                    else
+                        loop do
+                        /* this is an alarm message and we need to send it to
+                           node 1 (tossam serial reader) */
+                            msg_radio.target = 1;
+                            msg_radio.ushort_03 = 99;
+                            emit SEND_ACK(msg_radio);
+                            ack = await SEND_DONE_ACK(msg_radio.type);
+                            emit LEDS(0);
+                            emit LEDS(1);
+                            await 1s;
+                            emit LEDS(0);
+                            if ack == TRUE or counter > 4 then
+                                break;
+                            end
+                            counter = counter + 1;
+                            await 50ms;
+                        end
+                    end
+                else
+                    break;
+                end
+            end
+        end
+    end
+
+/*----------------------------------------------------------------------------*/
+
+else
+/*----------------------------------------------------------------------------*/
+/*---------------- This is the code running on all other nodes ---------------*/
+/*----------------------------------------------------------------------------*/
+/* if the photo sensor value for all nodes, except node 11, is >400 then we
+   disable the node for relaying messages. (Simulate a flaw in the device) */
+       
+    var t_msg received;
+    var t_msg my_alarm;
+    
+    par do
+    /* Respond to flood */
+        msg_flood.ushort_02 = initial_route;
+        msg_flood.source = node_id;
+        var ushort photo_value; //DEBUG
+
+        loop do
+            received = await RECEIVE(FLOOD_TYPE);
+            emit REQ_PHOTO(); //DEBUG
+            photo_value = await PHOTO; //DEBUG
+            if photo_value <= 400 then //DEBUG
+                if received.ushort_02 > msg_flood.ushort_02 then//send to others
+                    msg_flood.ushort_01 = received.source;
+                    msg_flood.ushort_03 = received.ushort_03 + 1;
+                    msg_flood.ushort_02 = received.ushort_02;
+                    msg_flood.type = FLOOD_TYPE;
+                    msg_flood.target = BROADCAST;
+                    qPut(msg_flood);
+                end
+            end //DEBUG
+        end
+    with
+    /* Receive an alarm type message */
+        var ushort photo_value; //DEBUG
+        loop do
+            msg_radio = await RECEIVE(ALARM_TYPE);
+            emit REQ_PHOTO(); //DEBUG
+            photo_value = await PHOTO; //DEBUG
+            if photo_value <= 400 then //DEBUG
+                msg_radio.type = ALARM_TYPE;
+                //change target to my parent
+                msg_radio.target = msg_flood.ushort_01;
+                qPut(msg_radio);
+            end
+        end
+    with
+    /* Test temperature sensor at almost every 15s */
+        var ushort temp_value;
+        loop do
+            par/or do
+                await 15s;
+            with
+                await 5s;
+                emit REQ_TEMP();
+                temp_value = await TEMP;
+
+                if temp_value > 500 then
+                    emit LED2(ON);
+                    my_alarm.source = node_id;
+                    my_alarm.ushort_02 = temp_value;
+                    my_alarm.ushort_01 = node_id;
+                    my_alarm.type = ALARM_TYPE;
+                    my_alarm.target = msg_flood.ushort_01;
+                    stat = qPut(my_alarm);
+                else
+                    emit LED2(OFF);
+                end
+                await FOREVER;
+            end
+        end
+    with
+    /* Send message */
+        var ubyte counter; // try to send alarm message to parent 5 times
+        loop do
+            await Q_READY;
+            loop do
+                if qSize() > 0 then
+                    stat = qGet(msg_radio);
+                    counter = 0;
+                    
+                    if msg_radio.target == BROADCAST then
+                    /* this is a flood message and we just send it */
+                        emit SEND(msg_radio);
+                        await SEND_DONE(msg_radio.type);
+                    else
+                        loop do
+                        /* this is an alarm message. Just send it */
+                            emit SEND_ACK(msg_radio);
+                            ack = await SEND_DONE_ACK(msg_radio.type);
+                            emit LEDS(0);
+                            emit LEDS(1);
+                            await 1s;
+                            emit LEDS(0);
+                            if ack == TRUE or counter > 4 then
+                                break;
+                            end
+                            counter = counter + 1;
+                            await 50ms;
+                        end
+                    end
+                else
+                    break;
+                end
+            end
+        end
+    end
+end

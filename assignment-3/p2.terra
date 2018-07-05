@@ -1,0 +1,298 @@
+#include "/home/terra/TerraNG/terra/TerraNet.defs"
+
+// configuration
+#define REQUEST_DESTINATION 33
+#define TEMPERATURES_SIZE   4
+#define MAXIMUM_TEMPERATURE 510
+#define GRID_WIDTH          4
+#define GRID_HEIGHT         4
+#define SUCCESSORS_SIZE     16
+
+// auxiliary
+#define INITIAL_ROUTE (0)
+#define SELF          (getNodeId())
+
+// macros: leds
+#define RED    1
+#define GREEN  2
+#define YELLOW 4
+#define ALL    7
+#define BLINK(led) emit LEDS(led); await 1s; emit LEDS(OFF);
+
+// macros: successors table
+#define UNREACHABLE   (0)
+#define J(id)         (id%10)        // column in the grid
+#define I(id)         ((id-J(id))/10) // row in the grid
+#define INDEX(id)     (GRID_WIDTH * (I(id)-1) + (J(id)-1))
+
+// messages
+#define ALARM   3
+#define ECHO    5
+#define FLOOD   7
+#define REQUEST 9
+
+pktype generic_msg from radioMsg with
+    // ALARM   : node that measured the temperature value
+    // FLOOD   : origin (parent node id)
+    // REQUEST : destination
+    var ubyte v1;
+    // ALARM   : temperature value
+    // FLOOD   : route (known route)
+    var ushort v2;
+    // FLOOD   : jumps (number of jumps to root)
+    var ubyte v3;
+    // ECHO    : successors table
+    var ubyte[SUCCESSORS_SIZE] successors;
+end
+
+// auxiliary
+var generic_msg message;
+
+// successors table
+var ubyte[SUCCESSORS_SIZE] successors;
+loop i, SUCCESSORS_SIZE do
+    successors[i] = UNREACHABLE;
+end
+
+// ----------------------------------------
+//
+if SELF == 11 then // gateway
+//
+// ----------------------------------------
+
+par do
+    // processes a message from the queue 
+    loop do
+        await Q_READY;
+        loop do
+            // checks if the queue has elements
+            if qSize() <= 0 then
+                break;
+            end
+            qGet(message);
+            if message.type == ALARM then
+                // targets tossam
+                message.v3 /* jumps */ = 100;
+                message.target = 1;
+            end
+            // sends the message
+            emit SEND(message);
+            await SEND_DONE;
+        end
+    end
+with
+    // waits for an alarm
+    loop do 
+        message = await RECEIVE(ALARM);
+        qPut(message);
+    end
+with
+    // sends a temperature request
+    // (if photo value is higher than 400)
+    loop do
+        emit REQ_PHOTO();
+        var ushort value = await PHOTO;
+        if value > 400 then
+            message.v1 /* destination */ = REQUEST_DESTINATION;
+            message.source = SELF;
+            message.type = REQUEST;
+
+            var ushort successor = successors[INDEX(REQUEST_DESTINATION)];
+            if successor == SELF then
+                // the target is one of my direct successors
+                message.target = REQUEST_DESTINATION;
+                qPut(message); 
+            else/if successor != UNREACHABLE then
+                // the target is reachable through one of my successors
+                message.target = successor;
+                qPut(message);
+            else
+                BLINK(ALL);
+            end
+        end
+        await 5s;
+    end
+with
+    // sends flood probe every 1 minute
+    var generic_msg probe;
+    probe.v2 /* route */ = INITIAL_ROUTE;
+    loop do
+        probe.v1 /* origin */ = SELF;
+        probe.v2 /* route  */ = probe.v2 + 1;
+        probe.v3 /* jumps  */ = 0;
+        probe.source = SELF;
+        probe.type = FLOOD;
+        probe.target = BROADCAST;
+        BLINK(RED);
+        qPut(probe);
+        
+        // waits for echos
+        par/or do
+            // fills the successor table with each echo
+            loop do
+                message = await RECEIVE(ECHO);
+                loop i, SUCCESSORS_SIZE do
+                    if message.successors[i] != UNREACHABLE then
+                        successors[i] = message.source;
+                    end
+                end
+                successors[INDEX(message.source)] = SELF;
+            end
+        with
+            // timeouts after 10 (arbitrary) seconds
+            await 10s;
+        end
+        
+        await 1min;
+    end
+end
+
+// ----------------------------------------
+//
+else // regular nodes
+//
+// ----------------------------------------
+    
+// auxiliary
+var ushort parent = 0;
+var ushort current_route = INITIAL_ROUTE;
+
+// temperatures
+var ubyte temperature_index = 0;            // index in the temperatures array
+var ushort[TEMPERATURES_SIZE] temperatures; // array of last 4 temperatures
+loop i, TEMPERATURES_SIZE do
+    temperatures[i] = 0;
+end
+
+par do
+    // processes a message from the queue 
+    loop do
+        await Q_READY;
+        loop do
+            // checks if the queue has elements
+            if qSize() <= 0 then
+                break;
+            end
+            // sends the message
+            qGet(message);
+            emit SEND(message);
+            await SEND_DONE;
+        end
+    end
+with
+    // waits for an alarm 
+    loop do
+        message = await RECEIVE(ALARM);
+        message.source = SELF;
+        message.target = parent;
+        qPut(message);
+    end
+with
+    // receives and propagates the flood probes
+    loop do
+        // receives a probe        
+        message = await RECEIVE(FLOOD);
+        
+        // continues the flood
+        if message.v2 /* route */ > current_route then
+            // updates current route number and alarm destination
+            current_route = message.v2 /* route */;
+            parent        = message.source;
+            // creates and sends a new probe
+            var generic_msg probe;
+            probe.v1 /* origin */ = message.source;
+            probe.v2 /* route  */ = message.v2;
+            probe.v3 /* jumps  */ = message.v3 + 1;
+            probe.source = SELF;
+            probe.type = FLOOD;
+            probe.target = BROADCAST;
+            qPut(probe);
+   
+            par/or do
+                // waits for echos for a while
+                loop do
+                    // fills the successor table with each echo
+                    var generic_msg msg = await RECEIVE(ECHO);
+                    loop i, SUCCESSORS_SIZE do
+                        if msg.successors[i] != UNREACHABLE then
+                            successors[i] = msg.source;
+                        end
+                    end
+                    successors[INDEX(msg.source)] = SELF;
+                end
+            with
+                // timeout is relative to jump count (5 is arbitrary)
+                await ((5-probe.v3)*2)s;
+                // sends echo back
+                message.successors = successors;
+                message.source = SELF;
+                message.type = ECHO;
+                message.target = parent;
+                qPut(message);
+            end
+        end
+    end
+with
+    // waits for a temperature request
+    loop do
+        message = await RECEIVE(REQUEST);
+        
+        // if reached the destination
+        if message.v1 /* destination */ == SELF then
+            // message node (v1) = SELF already set
+            message.v2  /* temperature */ = 0;
+            loop i, TEMPERATURES_SIZE do
+                message.v2 = message.v2 + temperatures[i];
+            end
+            message.v2 = message.v2 / 4;
+            message.source = SELF;
+            message.type = ALARM;
+            message.target = parent;
+            qPut(message);
+        // if the request must be sent forward
+        else
+            // message destination is already set
+            message.source = SELF;
+            message.type = REQUEST;
+            
+            var ushort successor = successors[INDEX(message.v1)];
+            if successor == SELF then
+                // the target is one of my direct successors
+                message.target = message.v1 /* destination */;
+                qPut(message); 
+            else/if successor != UNREACHABLE then
+                // the target is reachable through one of my successors
+                message.target = successor;
+                qPut(message);
+            else
+                BLINK(ALL);
+            end
+        end
+    end
+with
+    // gets the temperature every 5 seconds
+    // sends an alarm if necessary
+    loop do
+        emit REQ_TEMP();
+        temperatures[temperature_index] = await TEMP;
+        
+        // sends an alert if the temperature exceeds the maximum
+        if temperatures[temperature_index] >= MAXIMUM_TEMPERATURE then
+            message.v1 /* node        */ = SELF;
+            message.v2 /* temperature */ = temperatures[temperature_index];
+            message.source = SELF;
+            message.type = ALARM;
+            message.target = parent;
+            qPut(message);
+        end
+        
+        temperature_index = temperature_index + 1;
+        if temperature_index == TEMPERATURES_SIZE then
+            temperature_index = 0;
+        end
+        await 5s;
+    end
+end
+
+end // node if-else
+
