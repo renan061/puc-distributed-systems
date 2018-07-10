@@ -22,7 +22,7 @@ function mqttcb(topic, message)
     elseif topic == 'trabalho4/sd/joined' then
         if players[m.name] == nil then
             -- create a copy of the player in my world
-            players[m.name] = Player.new(username, m.x, m.y, m.r, m.g, m.b)
+            players[m.name] = Player.new(m.name, m.x, m.y, m.r, m.g, m.b)
             -- send my info to new player
             mqtt_client:publish("trabalho4/sd/joined", player:join_info())
         end
@@ -75,8 +75,8 @@ end
 function love.update(dt)
     mqtt_client:handler()
 
-    -- player shot?
     for _, player in pairs(players) do
+        -- shots
         if player.shot then
             projectile = Projectile.new()
             projectiles[player.name .. ':' .. player.shots + 1] = projectile
@@ -118,8 +118,20 @@ function love.update(dt)
         local newx = player.x + (player.speedx * dt)
         local newy = player.y + (player.speedy * dt)
         if not hitwall(newx, newy, player.size, player.size) then
-            player.x = newx
-            player.y = newy
+            if not hitplayer(player) then
+                player.x = newx
+                player.y = newy
+            else
+                -- gambiarra (to fix weird bug)
+                local oldx = player.x
+                local oldy = player.y
+                player.x = newx
+                player.y = newy
+                if hitplayer(player) then
+                    player.x = oldx
+                    player.y = oldy
+                end
+            end
         end
 
         for _, player in pairs(players) do
@@ -156,7 +168,7 @@ function love.update(dt)
             end
         end
 
-        -- deletes non existing projectiles
+        -- deletes non-existing projectiles
         for i, projectile in pairs(projectiles) do
             if not projectile.exists then
                 projectiles[i] = nil
@@ -236,6 +248,26 @@ end
 function hitwall(x, y, w, h)
     for _, wall in pairs(walls) do
         if check_collision(x, y, w, h, wall.x, wall.y, wall.w, wall.h) then
+            return true
+        end
+    end
+    return false
+end
+
+-- checks for collisions with other players
+function hitplayer(player)
+    for _, p in pairs(players) do
+        local collided = check_collision(
+            player.x,
+            player.y,
+            Player.size,
+            Player.size,
+            p.x,
+            p.y,
+            Player.size,
+            Player.size
+        )
+        if p.name ~= player.name and collided then
             return true
         end
     end
